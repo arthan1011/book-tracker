@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en" ng-app="bookTrackApp">
+<head>
+    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/angular_material/1.0.0/angular-material.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-animate.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-route.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-aria.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-messages.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="styles.css">
+    <link rel="stylesheet" type="text/css" href="styles-md.css">
+    <!--link rel="stylesheet" type="text/css" href="https://cdn.gitcdn.xyz/cdn/angular/bower-material/v1.0.1-master-a687bfc/angular-material.css"-->
+</head>
+<body>
+
+
+<div data-ng-controller="BookTrackCtrl as bookTrack">
+
+    <table>
+        <tr>
+            <td></td>
+            <td ng-repeat="md in monthDays" colspan="{{md.days.length}}">
+                {{md.month}}
+            </td>
+        </tr>
+        <tr>
+            <td></td>
+
+            <td ng-repeat="d in allDays"><div class="dayHeader">{{d}}</div></td>
+        </tr>
+        <tr><td></td><td colspan="{{allDays.length}}">Reading in progress</td></tr>
+        <tr ng-repeat="book in books">
+            <td>{{book.name}}</td>
+            <td ng-repeat="day in book.days">
+                    <div ng-if="day.type=='READING'" class="b_reading"> </div>
+                    <div ng-if="day.type=='START'" class="b_start"> </div>
+                    <div ng-if="day.type=='NOT_READING'" class="b_not_reading"
+                        ng-click="notReadingClick($event, day, book)"> </div>
+            </td>
+        </tr>
+        <tr><td></td><td colspan="{{allDays.length}}">Finished books</td></tr>
+    </table>
+
+    <input ng-model="newBookName">
+    <button ng-click="addBook()">Add Book</button>
+
+</div>
+
+
+
+<script>
+
+    var bookApp = angular.module('bookTrackApp', ['ngMaterial']);
+
+    bookApp.controller('BookTrackCtrl', ['$scope', '$http', '$httpParamSerializer', '$mdDialog',
+
+        function ($scope, $http, $httpParamSerializer, $mdDialog) {
+
+        $http.get('/book-tracker/all').success(function (data) {
+            $scope.books = data.books;
+            $scope.monthDays = data.monthDays;
+            $scope.allDays = [];
+
+            angular.forEach($scope.monthDays, function(monthes){
+                angular.forEach(monthes.days, function(day){
+                    $scope.allDays.push(day);
+                })
+            });
+        });
+
+        $scope.addBook = function() {
+            $http.defaults.headers.post["Content-Type"] = "application/x-www-form-urlencoded";
+            $http.post('/book-tracker/addBook',
+                    $httpParamSerializer({ book :  $scope.newBookName}) ).success(function(data){
+                $scope.books = data.books;
+            })
+        };
+
+            $scope.notReadingClick = function(ev, day, book) {
+                // Appending dialog to document.body to cover sidenav in docs app
+                var dateClicked = new Date(day.date);
+                var dateStartReading = new Date(book.startReading);
+
+                //if (dateClicked > dateStartReading) {
+                    var confirm = $mdDialog.confirm()
+                            .title('Reading or finished?')
+                            .textContent('Are you still reading "' + book.name + '" on ' + day.date + ' or have you finished it?')
+                            .targetEvent(ev)
+                            .ok("Reading")
+                            .cancel('Finished');
+
+                    $mdDialog.show(confirm).then(function() {
+                        // Reading
+                        /*$http.defaults.headers.post["Content-Type"] = "application/x-www-form-urlencoded";
+                        $http.post('/book-tracker/addReading',
+                                $httpParamSerializer({ book : book.name, date : day.date}) ).success(function(data){
+                            $scope.books = data.books;
+                        })*/
+                    }, function() {
+                        // Finished
+                        /*$http.defaults.headers.post["Content-Type"] = "application/x-www-form-urlencoded";
+                        $http.post('/book-tracker/finishedReading',
+                                $httpParamSerializer({ book : book.name, date : day.date}) ).success(function(data){
+                            $scope.books = data.books;
+                        })*/
+                    });
+                //}
+
+            };
+
+    }]);
+
+</script>
+
+
+
+
+</body>
+</html>

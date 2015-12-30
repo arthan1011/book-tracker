@@ -1,0 +1,53 @@
+.b_reading {
+    background: #fea2ff;
+    width: 18px;
+    height: 18px;
+    border: 1px;
+    border-color: black;
+}
+.b_start {
+    background: #ff52fb;
+    width: 18px;
+    height: 18px;
+    border: 1px;
+    border-color: black;
+}
+.b_not_reading {
+    background: #fdf8ff;
+    width: 18px;
+    height: 18px;
+    border: 1px;
+    border-color: black;
+}
+.dayHeader {
+    background: #d4d8ff;
+    width: 18px;
+    height: 18px;
+    border: 1px;
+    border-color: black;
+    text-align: center;
+}
+td{
+    border: 1px solid black;
+}
+
+
+html, body {
+    background: white none repeat scroll 0 0;
+    color: rgba(0, 0, 0, 0.87);
+    height: 100%;
+    position: relative;
+}
+body {
+    margin: 0;
+    padding: 0;
+}
+
+html, body {
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100%;
+}
+
+button, select, html, textarea, input {
+    font-family: Roboto,"Helvetica Neue",sans-serif;
+}
